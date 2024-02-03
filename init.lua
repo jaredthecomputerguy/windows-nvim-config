@@ -256,6 +256,12 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+{
+   "folke/todo-comments.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
+opts = {},
+}
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -572,8 +578,9 @@ require('mason-lspconfig').setup()
 local servers = {
   -- clangd = {},
   -- gopls = {},
-  -- pyright = {},
+  pyright = {},
   -- rust_analyzer = {},
+  emmet_ls = {},
   tailwindcss = {},
   tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs'} },
