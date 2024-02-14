@@ -1,4 +1,5 @@
 --[[
+--:
 
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
@@ -13,7 +14,7 @@ Kickstart.nvim is a template for your own configuration.
   Once you've done that, you should start exploring, configuring and tinkering to
   explore Neovim!
 
-  If you don't know anything about Lua, I recommend taking some time to read through
+If you don't know anything about Lua, I recommend taking some time to read through
   a guide. One possible example:
   - https://learnxinyminutes.com/docs/lua/
 
@@ -45,10 +46,14 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.cmd("set number")
 vim.cmd("set relativenumber")
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
+-- how can i type the function below this?
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system {
@@ -190,8 +195,6 @@ require('lazy').setup({
       end,
     },
   },
-  -- Color theme
-  'rebelot/kanagawa.nvim',
   {
 
     -- Set lualine as statusline
@@ -206,7 +209,15 @@ require('lazy').setup({
       },
     },
   },
-
+ {
+    "folke/tokyonight.nvim",
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      -- load the colorscheme here
+      vim.cmd([[colorscheme tokyonight]])
+    end,
+  },
   {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
@@ -253,6 +264,10 @@ require('lazy').setup({
    "folke/todo-comments.nvim",
   dependencies = { "nvim-lua/plenary.nvim" },
 opts = {},
+},
+
+{
+  "ThePrimeagen/harpoon"
 }
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
@@ -420,6 +435,18 @@ vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by 
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
 
+vim.keymap.set('n', '<leader>ha', require('harpoon.mark').add_file)
+vim.keymap.set('n', '<leader>hm', require('harpoon.ui').toggle_quick_menu)
+vim.keymap.set('n', '<leader>h1', function()
+  require('harpoon.ui').nav_file(1) 
+end)
+vim.keymap.set('n', '<leader>h2', function()
+  require('harpoon.ui').nav_file(2) 
+end)
+vim.keymap.set('n', '<leader>h3', function()
+  require('harpoon.ui').nav_file(3)
+end)
+
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
@@ -532,6 +559,7 @@ local on_attach = function(_, bufnr)
   nmap('<leader>wl', function()
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
+  
 
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
@@ -544,7 +572,6 @@ require('which-key').register {
   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
   ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
@@ -560,8 +587,6 @@ require('which-key').register({
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
 require('mason').setup()
-require('mason-lspconfig').setup()
-
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 --
@@ -572,7 +597,7 @@ require('mason-lspconfig').setup()
 --  define the property 'filetypes' to the map in question.
 local servers = {
   -- clangd = {},
-  -- gopls = {},
+  gopls = {},
   pyright = {},
   -- rust_analyzer = {},
   emmet_ls = {},
